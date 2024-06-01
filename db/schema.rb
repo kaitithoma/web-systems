@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_05_19_115346) do
+ActiveRecord::Schema[7.1].define(version: 2024_06_01_091818) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
   enable_extension "unaccent"
@@ -118,6 +118,22 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_19_115346) do
     t.index ["retailer_brand_id"], name: "index_retailer_products_on_retailer_brand_id"
     t.index ["retailer_category_id"], name: "index_retailer_products_on_retailer_category_id"
     t.index ["site_id"], name: "index_retailer_products_on_site_id"
+  end
+
+  create_table "schedules", force: :cascade do |t|
+    t.string "name", null: false
+    t.integer "frequency", null: false
+    t.string "at"
+    t.string "tz"
+    t.boolean "skip_first_run", default: false
+    t.string "job_name", null: false
+    t.json "job_arguments"
+    t.string "queue_name"
+    t.string "environments", default: [], array: true
+    t.integer "day"
+    t.integer "month"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "sites", force: :cascade do |t|
