@@ -8,7 +8,6 @@ require './config/environment'
 # Clockwork configuration for scheduling tasks
 module Clockwork
   configure do |config|
-    config[:sleep_timeout] = 10
     config[:tz] = 'Europe/Athens'
     config[:max_threads] = 15
     config[:thread] = true
