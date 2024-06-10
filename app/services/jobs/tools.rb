@@ -8,13 +8,14 @@ module Jobs
     }.freeze
     # The order here is important
     # e.g, "Nestle Manhattan Παγωτό Βανίλια-Φράουλα 757gr (1400ml)"
+    # Longer strings should be first proper product name cleaning
     MEASUREMENT_UNIT = {
-      'LT' => %w[L LΤ LT],
-      'GR' => %w[G ΓΡ GR],
+      'LT' => %w[LΤ LT L],
+      'GR' => %w[ΓΡ GR G],
       'KG' => %w[ΚG KG],
       'ΤΜΧ' => %w[ΤΜΧ ΤΕΜ],
       'ML' => %w[ΜΛ ΜΛ ΜL ML],
-      'ΜΕΖ' => %w[ΜΕΖ MEZ MΕΖ MΕZ ΜΕZ MEΖ ΜEZ ΜΕΖΟΥΡΕΣ M Μ]
+      'ΜΕΖ' => %w[ΜΕΖΟΥΡΕΣ ΜΕΖ MEZ MΕΖ MΕZ ΜΕZ MEΖ ΜEZ M Μ]
     }.freeze
 
     class << self

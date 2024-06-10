@@ -10,12 +10,18 @@ require 'uri'
 class FetchMyMarketDataJob < ApplicationJob
   queue_as :default
 
-  def perform
+  def perform(*_args)
     # Fetch products using Nokogiri
     @site = Site.find_by(name: 'My Market')
     @url = @site.url
     fill_array
-    RetailerProductPriceMetric.import(@array, on_duplicate_key_ignore: true)
+    RetailerProductPriceMetric.import(
+      @array,
+      on_duplicate_key_update: {
+        conflict_target: %i[site_id product_name date],
+        columns: %i[price_data category_name url]
+      }
+    )
   end
 
   private
@@ -41,7 +47,8 @@ class FetchMyMarketDataJob < ApplicationJob
       price_data: price_data(product),
       category_name: CGI.unescape(link).gsub('/search?categories=', '').strip,
       date: Date.today,
-      site_id: @site.id
+      site_id: @site.id,
+      # url: @url
     }
   end
 
@@ -58,7 +65,6 @@ class FetchMyMarketDataJob < ApplicationJob
 
   def fill_array
     @array = []
-
     category_links.each do |link|
       page = 1
       iterate_pages(page, link)

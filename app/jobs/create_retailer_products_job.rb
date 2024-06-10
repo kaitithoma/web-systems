@@ -1,21 +1,24 @@
 # frozen_string_literal: true
 
-class CreateRetailerProductsJob < ActiveJob::Base
+class CreateRetailerProductsJob < ApplicationJob
   require './app/services/jobs/tools'
 
   queue_as :default
 
-  def perform(site_id)
-    @site_id = site_id
+  def perform(site_id = nil)
+    @site_ids = site_id.nil? ? Site.pluck(:id) : [site_id]
     RetailerProduct.import(
-      retailer_products, validate: false,
-                         on_duplicate_key_update: { conflict_target: %i[name site_id] }
+      unique_products, validate: false,
+                       on_duplicate_key_update: {
+                         conflict_target: %i[name site_id],
+                         columns: %i[measurement_unit quantity bundle url retailer_category_id]
+                       }
     )
   end
 
   private
 
-  attr_reader :site_id
+  attr_reader :site_ids
 
   def measurement_unit(name)
     Jobs::Tools.get_alias_for_unit_measurement(name)
@@ -51,19 +54,28 @@ class CreateRetailerProductsJob < ActiveJob::Base
   def retailer_products
     # Retrieve all RetailerProductPriceMetric objects
     retailer_product_price_metrics = RetailerProductPriceMetric.where(
-      site_id: site_id
-    ).select(:product_name).distinct(:product_name)
-
+      site_id: site_ids
+    ).where.not(url: nil).select(:product_name, :url, :category_name, :site_id)#.distinct(:product_name)
     retailer_product_price_metrics.map do |metric|
       name = Jobs::Tools.remove_greek_accents(metric.product_name.upcase)
       measurement_unit = measurement_unit(name)
       {
         name: metric.product_name,
-        site_id: site_id,
+        site_id: metric.site_id,
         measurement_unit: measurement_unit,
         quantity: quantity(name, measurement_unit),
-        bundle: bundle(name, measurement_unit)
+        bundle: bundle(name, measurement_unit),
+        url: metric.url,
+        retailer_category_id: RetailerCategory.find_or_create_by(
+          name: metric.category_name, site_id: metric.site_id
+        ).id
       }
+    end
+  end
+
+  def unique_products
+    retailer_products.to_a.uniq do |item|
+      %i[name site_id].map { |field| item[field] }.join(':')
     end
   end
 end

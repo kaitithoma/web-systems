@@ -8,12 +8,21 @@ require 'pry'
 class FetchEFreshDataJob < ApplicationJob
   queue_as :default
 
-  def perform
+  def perform(*_args)
     # Fetch products using Nokogiri
     @site = Site.find_by(name: 'E-Fresh')
     @url = @site.url
-    fill_array
-    RetailerProductPriceMetric.import(@array, on_duplicate_key_ignore: true)
+
+    binding.pry
+    return
+
+    RetailerProductPriceMetric.import(
+      uniq_values,
+      on_duplicate_key_update: {
+        conflict_target: %i[site_id product_name date],
+        columns: %i[price_data category_name url]
+      }
+    )
   end
 
   private
@@ -53,10 +62,17 @@ class FetchEFreshDataJob < ApplicationJob
     /(?:,"price_old_per_unit":)(.*?)(?=(?:,"tax_rate":))/
   end
 
+  def url_regex
+    /(?:,"subcode_groups":\[[.|\s]*\],"links":\{"web":")(.*?)(?=(?:","app":))/
+  end
+
   def iterate_pages(page, link)
     html_content = URI.open("#{link}?page=#{page}&order=position").read.gsub(
       /\\u([\da-fA-F]{4})/
     ) { $1.hex.chr(Encoding::UTF_8) }
+
+
+    # binding.pry
 
     doc = Nokogiri::HTML(html_content)
     product_names = doc.content.scan(product_regex).flatten
@@ -75,13 +91,17 @@ class FetchEFreshDataJob < ApplicationJob
         },
         category_name: doc.content.scan(category_name_regex).flatten[index],
         date: Date.today,
-        site_id: @site.id
+        site_id: @site.id,
+        url: doc.content.scan(url_regex).flatten[index].gsub('\\', '')
       }
     end
     page += 1
     # puts page if page % 10 == 0
     iterate_pages(page, link)
   rescue OpenURI::HTTPError => e
+
+    # binding.pry
+
     puts "Error: #{e.message}"
   end
 
@@ -94,5 +114,12 @@ class FetchEFreshDataJob < ApplicationJob
     end
   rescue OpenURI::HTTPError => e
     puts "Error: #{e.message}"
+  end
+
+  def uniq_values
+    fill_array
+    @array.to_a.uniq do |item|
+      %i[site_id product_name date].map { |field| item[field] }.join(':')
+    end
   end
 end

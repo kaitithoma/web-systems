@@ -1,0 +1,90 @@
+<!-- app/views/products/index.html.erb -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Products</title>
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Include jQuery -->
+  <!-- Include Select2 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
+
+  <!-- Include Select2 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
+</head>
+<body>
+
+<form class="form-inline" style="margin-bottom: 20px; margin-top: 20px; margin-left: 20px; margin-right: 20px">
+  <div class="input-group">
+    <%= form_tag('/products', method: 'get') do %>
+      <%= text_field_tag :q, params[:q], class: 'form-control mr-sm-2', placeholder: 'Search for name', style: "margin-right: 10px;" %>
+
+      <%= select_tag :category_id, options_from_collection_for_select(Category.where(id: Product.pluck(:category_id)).order(:name), :id, :name),
+                                include_blank: 'Select a category', class: 'nav-link dropdown-toggle', style: "margin-right: 10px;" %>
+
+      <%= select_tag :brand_id, options_from_collection_for_select(Brand.where(id: Product.pluck(:brand_id)).order(:name), :id, :name),
+                                include_blank: 'Select a brand', class: 'nav-link dropdown-toggle', id: 'brand-select' %>
+
+      <%= select_tag :measurement_unit, options_for_select(Product.all.order(:measurement_unit).pluck(:measurement_unit).uniq.compact, :id),
+          include_blank: 'Select a unit', class: 'nav-link dropdown-toggle', style: "margin-left: 10px;" %>
+
+      <div class="form-check form-check-inline">
+          <%= radio_button_tag :bundled, 'true', false %>
+          <%= label_tag 'bundled_true', 'With Discount' %>
+      </div>
+      <div class="form-check form-check-inline">
+          <%= radio_button_tag :bundled, 'false', false %>
+          <%= label_tag 'bundled_false', 'Without Discount' %>
+      </div>
+
+      <%= submit_tag 'Search', class: 'btn btn-success', style:"margin-left: 10px;" %>
+    <% end %>
+  </div>
+</form>
+
+<div class="container">
+  <h1>Products</h1>
+
+  <div class="d-flex justify-content-center">
+    <%= paginate @products %>
+  </div>
+
+  <!-- Example Bootstrap Table -->
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Name</th>
+        <th scope="col">Category</th>
+        <th scope="col">Brand</th>
+        <th scope="col">Quantity</th>
+        <th scope="col">Unit</th>
+        <th scope="col">Discount</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @products.each_with_index do |product, index| %>
+        <tr>
+          <td><%= (@page.to_i - 1) * @per.to_i + index + 1 %></td>
+          <td><%= link_to product.name, product_path(id: product.id) %></td>
+          <td><%= product.category_name %></td>
+          <td><%= product.brand_name %></td>
+          <td><%= product.quantity %></td>
+          <td><%= product.measurement_unit %></td>
+          <td><%= product.bundle %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <div class="d-flex justify-content-center">
+    <%= paginate @products %>
+  </div>
+
+</div>
+
+</body>
+</html>

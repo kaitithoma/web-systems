@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_06_01_091818) do
+ActiveRecord::Schema[7.1].define(version: 2024_06_09_145746) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
   enable_extension "unaccent"
@@ -28,6 +28,21 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_01_091818) do
     t.string "aliases", default: [], array: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "delayed_jobs", force: :cascade do |t|
+    t.integer "priority", default: 0, null: false
+    t.integer "attempts", default: 0, null: false
+    t.text "handler", null: false
+    t.text "last_error"
+    t.datetime "run_at"
+    t.datetime "locked_at"
+    t.datetime "failed_at"
+    t.string "locked_by"
+    t.string "queue"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.index ["priority", "run_at"], name: "delayed_jobs_priority"
   end
 
   create_table "product_price_metrics", force: :cascade do |t|
@@ -56,7 +71,9 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_01_091818) do
     t.bigint "category_id"
     t.virtual "searchable", type: :tsvector, as: "(((((((((((((((to_tsvector('simple'::regconfig, COALESCE(custom_unaccent((name)::text), ''::text)) || to_tsvector('simple'::regconfig, custom_unaccent(array_to_string_immutable((aliases)::text[], ' '::text)))) || to_tsvector('english'::regconfig, COALESCE(custom_unaccent((name)::text), ''::text))) || to_tsvector('english'::regconfig, custom_unaccent(array_to_string_immutable((aliases)::text[], ' '::text)))) || to_tsvector('greek'::regconfig, COALESCE(custom_unaccent((name)::text), ''::text))) || to_tsvector('greek'::regconfig, custom_unaccent(array_to_string_immutable((aliases)::text[], ' '::text)))) || to_tsvector('german'::regconfig, COALESCE(custom_unaccent((name)::text), ''::text))) || to_tsvector('german'::regconfig, custom_unaccent(array_to_string_immutable((aliases)::text[], ' '::text)))) || to_tsvector('french'::regconfig, COALESCE(custom_unaccent((name)::text), ''::text))) || to_tsvector('french'::regconfig, custom_unaccent(array_to_string_immutable((aliases)::text[], ' '::text)))) || to_tsvector('italian'::regconfig, COALESCE(custom_unaccent((name)::text), ''::text))) || to_tsvector('italian'::regconfig, custom_unaccent(array_to_string_immutable((aliases)::text[], ' '::text)))) || to_tsvector('spanish'::regconfig, COALESCE(custom_unaccent((name)::text), ''::text))) || to_tsvector('spanish'::regconfig, custom_unaccent(array_to_string_immutable((aliases)::text[], ' '::text)))) || to_tsvector('swedish'::regconfig, COALESCE(custom_unaccent((name)::text), ''::text))) || to_tsvector('swedish'::regconfig, custom_unaccent(array_to_string_immutable((aliases)::text[], ' '::text))))", stored: true
     t.index ["brand_id"], name: "index_products_on_brand_id"
+    t.index ["bundle"], name: "index_products_on_bundle"
     t.index ["category_id"], name: "index_products_on_category_id"
+    t.index ["measurement_unit"], name: "index_products_on_measurement_unit"
     t.index ["name"], name: "index_products_on_name", unique: true
     t.index ["searchable"], name: "index_products_on_searchable", using: :gin
   end
@@ -141,6 +158,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_01_091818) do
     t.string "url", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "fetch_data_job"
+    t.string "fetch_brands_job"
   end
 
   add_foreign_key "product_price_metrics", "retailer_products"

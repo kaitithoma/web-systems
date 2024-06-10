@@ -19,6 +19,7 @@ gem "importmap-rails"
 
 # Hotwire's SPA-like page accelerator [https://turbo.hotwired.dev]
 gem "turbo-rails"
+gem 'turbolinks', '~> 5'
 
 # Hotwire's modest JavaScript framework [https://stimulus.hotwired.dev]
 gem "stimulus-rails"
@@ -34,6 +35,11 @@ gem "redis", ">= 4.0.1"
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 # gem "bcrypt", "~> 3.1.7"
+
+# Important for delayed job
+gem 'daemons', '~> 1.4'
+# Gem for running methods as jobs
+gem 'delayed_job_active_record', '~> 4.1'
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ mswin mswin64 mingw x64_mingw jruby ]
@@ -69,6 +75,8 @@ gem 'stopwords-filter', require: 'stopwords'
 gem 'chartkick'
 gem 'groupdate'
 
+gem 'webpacker'
+
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri mswin mswin64 mingw x64_mingw ]
@@ -88,5 +96,4 @@ end
 group :test do
   # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
   gem "capybara"
-  gem "selenium-webdriver"
 end

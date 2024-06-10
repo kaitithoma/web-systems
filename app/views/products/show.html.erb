@@ -1,0 +1,44 @@
+<!-- app/views/products/index.html.erb -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Product</title>
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container">
+  <h1>Products per Retailer</h1>
+
+  <!-- Example Bootstrap Table -->
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Name</th>
+        <th scope="col">Retailer</th>
+        <th scope="col">Price</th>
+        <th scope="col">Unit Price</th>
+      </tr>
+    </thead>
+    <tbody>
+      <%= link_to 'Price History Diagram', products_price_history_path(@product.id), class: 'btn btn-info' %>
+      <% @product.prices_per_site.sort_by{ |p| p[:price] }.each_with_index do |metric, index| %>
+        <tr>
+          <td><%= index + 1 %></td>
+          <td><%= link_to metric[:name], metric[:url] %></td>
+          <td><%= metric[:site] %></td>
+          <td><%= metric[:price] %></td>
+          <td><%= metric[:measurement_unit_price] %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+</body>
+</html>

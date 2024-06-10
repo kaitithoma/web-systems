@@ -15,7 +15,7 @@ class Schedule < ApplicationRecord
   end
 
   def if?(time)
-    active? && environment_valid? && valid_day_month?(time)
+    environment_valid? && valid_day_month?(time)
   end
 
   protected

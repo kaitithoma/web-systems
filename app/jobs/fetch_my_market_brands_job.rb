@@ -11,7 +11,7 @@ class FetchMyMarketBrandsJob < ApplicationJob
 
   queue_as :default
 
-  def perform
+  def perform(*_args)
     @site = Site.find_by(name: 'My Market')
     @url = @site.url
     RetailerBrand.import(brands_set.to_a, on_duplicate_key_ignore: true)
