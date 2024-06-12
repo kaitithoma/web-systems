@@ -13,9 +13,6 @@ class FetchEFreshDataJob < ApplicationJob
     @site = Site.find_by(name: 'E-Fresh')
     @url = @site.url
 
-    binding.pry
-    return
-
     RetailerProductPriceMetric.import(
       uniq_values,
       on_duplicate_key_update: {

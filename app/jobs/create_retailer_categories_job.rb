@@ -7,8 +7,8 @@ class CreateRetailerCategoriesJob < ApplicationJob
     # Retrieve all RetailerProductPriceMetric objects
     site_ids = site_id.nil? ? Site.pluck(:id) : [site_id]
     retailer_product_price_metrics = RetailerProductPriceMetric.where(
-      site_ids: site_ids
-    ).select(:category_name).distinct(:category_name)
+      "site_id IN (#{site_ids.join(',')})"
+    ).select(:category_name, :site_id).distinct(:category_name)
 
     # Iterate over each RetailerProductPriceMetric object
     retailer_product_price_metrics.each do |metric|
