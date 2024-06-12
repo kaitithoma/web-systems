@@ -44,12 +44,7 @@ class AddTsvectorToProducts < ActiveRecord::Migration[7.1]
   end
 
   def down
-    remove_column :brands, :searchable
-    remove_column :users, :searchable
     remove_column :products, :searchable
-    remove_column :retailer_categories, :searchable
-    remove_column :search_terms, :searchable
-    remove_column :site_pages, :searchable
 
     execute <<~SQL
       DROP FUNCTION array_to_string_immutable;
