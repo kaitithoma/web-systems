@@ -15,9 +15,6 @@ class MatchBrandsJob < ApplicationJob
         other_brands = RetailerBrand.where.not(site_id: site.id)
         other_brands.each do |other_brand|
           other_brand_name = compared_name(other_brand.name)
-
-          # binding.pry if brand.id == 1398 && other_brand.id == 4480
-
           next unless matched(brand_name, other_brand_name)
 
           if (matched_brand = Brand.where(

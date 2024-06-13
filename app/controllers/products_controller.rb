@@ -65,9 +65,6 @@ class ProductsController < ApplicationController
         metric&.price || nil
       end
     end
-
-    # binding.pry
-
     @datasets = @prices.map.with_index do |prices, index|
       color = "##{SecureRandom.hex(3)}"
       {

@@ -41,9 +41,6 @@ class SitesController < ApplicationController
 
   def fetch_brands
     site = Site.find(params[:id])
-
-    # binding.pry
-
     site.fetch_brands_job.safe_constantize.perform_later
     flash[:notice] = 'Job is being performed.'
   end

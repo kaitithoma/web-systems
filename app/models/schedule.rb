@@ -27,9 +27,6 @@ class Schedule < ApplicationRecord
   end
 
   def job_class
-
-    # binding.pry
-
     ApplicationJob.descendants.find do |subclass|
       subclass.name == job_name
     end
