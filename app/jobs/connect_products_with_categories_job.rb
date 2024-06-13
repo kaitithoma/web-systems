@@ -3,9 +3,11 @@
 class ConnectProductsWithCategoriesJob < ApplicationJob
   queue_as :default
 
-  def perform(site_id = nil)
-    @site_ids = site_id.nil? ? Site.pluck(:id) : [site_id]
+  def perform(args)
+    @site_ids = args[:site_id].nil? ? Site.pluck(:id) : [args[:site_id]]
+    establish_connection(args[:country])
     connect
+    ActiveRecord::Base.establish_connection(:primary)
   end
 
   private

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class ProductPriceMetric < ApplicationRecord
+class ProductPriceMetric < ShardRecord
   belongs_to :retailer_product
 
   validates :price, presence: true

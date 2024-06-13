@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Site < ApplicationRecord
+class Site < ShardRecord
   has_many :retailer_products
   has_many :retailer_brands
 

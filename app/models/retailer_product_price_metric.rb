@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class RetailerProductPriceMetric < ApplicationRecord
+class RetailerProductPriceMetric < ShardRecord
   belongs_to :retailer_product, optional: true
   belongs_to :retailer_category, optional: true
   belongs_to :site

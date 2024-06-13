@@ -5,20 +5,23 @@ class CreateRetailerProductsJob < ApplicationJob
 
   queue_as :default
 
-  def perform(site_id = nil)
-    @site_ids = site_id.nil? ? Site.pluck(:id) : [site_id]
-    RetailerProduct.import(
-      unique_products, validate: false,
-                       on_duplicate_key_update: {
-                         conflict_target: %i[name site_id],
-                         columns: %i[measurement_unit quantity bundle url retailer_category_id]
-                       }
-    )
+  def perform(args)
+    @site_ids = args[:site_id].nil? ? Site.pluck(:id) : [args[:site_id]]
+    @country = args[:country]
+    establish_shard_connection(country) do
+      RetailerProduct.import(
+        unique_products, validate: false,
+                        on_duplicate_key_update: {
+                          conflict_target: %i[name site_id],
+                          columns: %i[measurement_unit quantity bundle url retailer_category_id]
+                        }
+      )
+    end
   end
 
   private
 
-  attr_reader :site_ids
+  attr_reader :site_ids, :country
 
   def measurement_unit(name)
     Jobs::Tools.get_alias_for_unit_measurement(name)

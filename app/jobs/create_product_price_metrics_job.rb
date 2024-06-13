@@ -32,15 +32,17 @@ class CreateProductPriceMetricsJob < ApplicationJob
      'price_per_unit'] => 'final_price_per_unit'
   }.freeze
 
-  def perform(site_id = nil)
-    @sites = site_id.nil? ? Site.all : Site.where(id: site_id)
-    ProductPriceMetric.import(
-      product_price_metrics,
-      on_duplicate_key_update: {
-        conflict_target: %i[retailer_product_id date],
-        columns: %i[price measurement_unit_price old_price old_measurement_unit_price url]
-      }
-    )
+  def perform(args)
+    @sites = args[:site_id].nil? ? Site.all : Site.where(id: args[:site_id])
+    establish_shard_connection(args[:country]) do
+      ProductPriceMetric.import(
+        product_price_metrics,
+        on_duplicate_key_update: {
+          conflict_target: %i[retailer_product_id date],
+          columns: %i[price measurement_unit_price old_price old_measurement_unit_price url]
+        }
+      )
+    end
   end
 
   private

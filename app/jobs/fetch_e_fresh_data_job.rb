@@ -8,21 +8,29 @@ require 'pry'
 class FetchEFreshDataJob < ApplicationJob
   queue_as :default
 
-  def perform(*_args)
+  def perform(args)
     # Fetch products using Nokogiri
     @site = Site.find_by(name: 'E-Fresh')
     @url = @site.url
+    @country = args[:country]
 
-    RetailerProductPriceMetric.import(
-      uniq_values,
-      on_duplicate_key_update: {
-        conflict_target: %i[site_id product_name date],
-        columns: %i[price_data category_name url]
-      }
-    )
+    # Establish a connection to the correct shard
+    establish_shard_connection(country) do
+
+      RetailerProductPriceMetric.import(
+        uniq_values,
+        on_duplicate_key_update: {
+          conflict_target: %i[site_id product_name date],
+          columns: %i[price_data category_name url]
+        }
+      )
+
+    end
   end
 
   private
+
+  attr_reader :country
 
   def category_links
     Nokogiri::HTML(URI.open(@url.to_s)).css('#nav-menu').css('.level-1').css('a').map do |row|
@@ -67,10 +75,6 @@ class FetchEFreshDataJob < ApplicationJob
     html_content = URI.open("#{link}?page=#{page}&order=position").read.gsub(
       /\\u([\da-fA-F]{4})/
     ) { $1.hex.chr(Encoding::UTF_8) }
-
-
-    # binding.pry
-
     doc = Nokogiri::HTML(html_content)
     product_names = doc.content.scan(product_regex).flatten
 
@@ -96,9 +100,6 @@ class FetchEFreshDataJob < ApplicationJob
     # puts page if page % 10 == 0
     iterate_pages(page, link)
   rescue OpenURI::HTTPError => e
-
-    # binding.pry
-
     puts "Error: #{e.message}"
   end
 

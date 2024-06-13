@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class RetailerCategory < ApplicationRecord
+class RetailerCategory < ShardRecord
   validates :name, presence: true, uniqueness: { scope: :site_id }
 
   belongs_to :category, optional: true

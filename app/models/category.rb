@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Category < ApplicationRecord
+class Category < ShardRecord
   validates :name, presence: true, uniqueness: true
 
   has_many :retailer_categories

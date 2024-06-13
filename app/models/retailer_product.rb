@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class RetailerProduct < ApplicationRecord
+class RetailerProduct < ShardRecord
   UNIT_STRINGS = {
     'LT' => 'Litre',
     'ML' => 'Litre',
@@ -23,9 +23,6 @@ class RetailerProduct < ApplicationRecord
 
   def last_price
     metric = product_price_metrics.order(date: :desc).first
-
-    # binding.pry unless metric
-
     {
       name: name,
       site: site.name,

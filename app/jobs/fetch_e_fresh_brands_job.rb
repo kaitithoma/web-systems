@@ -11,15 +11,19 @@ class FetchEFreshBrandsJob < ApplicationJob
 
   queue_as :default
 
-  def perform(*_args)
+  def perform(args)
     # Fetch brands using Nokogiri
     @site = Site.find_by(name: 'E-Fresh')
     @url = @site.url
-    RetailerBrand.import(brands_set.to_a, on_duplicate_key_ignore: true)
-    # 1206 (unique) brands imported
+    @country = args[:country]
+    establish_shard_connection(country) do
+      RetailerBrand.import(brands_set.to_a, on_duplicate_key_ignore: true)
+    end
   end
 
   private
+
+  attr_reader :country
 
   def category_links
     Nokogiri::HTML(URI.open(@url.to_s)).css('#nav-menu').css('.level-1').css('a').map do |row|
@@ -43,9 +47,6 @@ class FetchEFreshBrandsJob < ApplicationJob
       # Match whatever is not followed by ","link":"efreshgr:\/\/category\/\?
       regex = /(?:food_brand=\d+","app":\[{"title":")(.*?)(?!","link":"efreshgr:\\\/\\\/category\\\/\?)(?=(?:","link":"efreshgr:\\\/\\\/list\\\/\?))/ # FINAL REGEX OMGOMGOMG
       brand_names = js_code.scan(regex).flatten
-
-      # binding.pry
-
       array << brand_names.map do |name|
         { name: name, site_id: @site.id }
       end

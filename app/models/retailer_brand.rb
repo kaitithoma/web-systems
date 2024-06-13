@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class RetailerBrand < ApplicationRecord
+class RetailerBrand < ShardRecord
   has_many :retailer_products
   belongs_to :site
   belongs_to :brand, optional: true

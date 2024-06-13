@@ -32,24 +32,25 @@ require 'selenium-webdriver'
 class FetchMyMarketDataNewJob < ApplicationJob
   queue_as :default
 
-  def perform(*_args)
+  def perform(args)
     # Fetch products using Nokogiri
-
-    # binding.pry
-
     @site = Site.find_by(name: 'My Market')
     @url = @site.url
+    @country = args[:country]
 
-    # binding.pry
+    establish_shard_connection(country) do
 
-    RetailerProductPriceMetric.import(
-      unique_items, on_duplicate_key_update: {
-        conflict_target: %i[site_id product_name date], columns: %i[price_data category_name url]
-      }
-    )
+      RetailerProductPriceMetric.import(
+        unique_items, on_duplicate_key_update: {
+          conflict_target: %i[site_id product_name date], columns: %i[price_data category_name url]
+        }
+      )
+    end
   end
 
   private
+
+  attr_reader :country
 
   def category_links
     # Initialize a Selenium WebDriver instance
@@ -89,7 +90,6 @@ class FetchMyMarketDataNewJob < ApplicationJob
   end
 
   def product_hash(product, category_name)
-    # binding.pry if product.css('.teaser-sku').text.encode('iso-8859-1').force_encoding('utf-8')[/\d+/]&.strip.nil?
     {
       product_name: product.css('h3').text.encode('iso-8859-1').force_encoding('utf-8')&.strip,
       retailer_id: product.css('.sku').text.encode('iso-8859-1').force_encoding('utf-8')[/\d+/]&.strip,
@@ -124,9 +124,6 @@ class FetchMyMarketDataNewJob < ApplicationJob
 
   def unique_items
     fill_array
-
-    binding.pry
-
     @array.uniq do |item|
       %i[site_id product_name date].map { |field| item[field] }.join(':')
     end

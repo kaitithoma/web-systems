@@ -25,16 +25,18 @@ default: &default
 
 development:
   primary:
+    <<: *default
     database: web_systems_development
+  country1:
+    database: web_systems_development_country_1
     username: kaiti
     password: 12345
     adapter: postgresql
-  primary_replica:
-    database: web_systems_development_replica
+  country2:
+    database: web_systems_development_country_2
     username: kaiti
     password: 12345
     adapter: postgresql
-    replica: true
 
   # The specified database role being used to connect to PostgreSQL.
   # To create additional roles in PostgreSQL see `$ createuser --help`.

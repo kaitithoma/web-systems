@@ -11,13 +11,18 @@ class FetchMyMarketBrandsJob < ApplicationJob
 
   queue_as :default
 
-  def perform(*_args)
+  def perform(args)
     @site = Site.find_by(name: 'My Market')
     @url = @site.url
-    RetailerBrand.import(brands_set.to_a, on_duplicate_key_ignore: true)
+    @country = args[:country]
+    establish_shard_connection(country) do
+      RetailerBrand.import(brands_set.to_a, on_duplicate_key_ignore: true)
+    end
   end
 
   private
+
+  attr_reader :country
 
   def category_links
     doc = Nokogiri::HTML(URI.open(@url))

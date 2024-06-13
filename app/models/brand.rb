@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Brand < ApplicationRecord
+class Brand < ShardRecord
   has_many :retailer_brands
   has_many :retailer_products, through: :retailer_brands
   validates :name, presence: true, uniqueness: true

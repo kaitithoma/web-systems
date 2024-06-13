@@ -7,29 +7,31 @@ class MatchBrandsJob < ApplicationJob
 
   queue_as :default
 
-  def perform(site_id = nil)
-    sites = site_id.nil? ? Site.all : Site.where(id: site_id)
-    sites.each do |site|
-      site.retailer_brands.where(brand_id: nil).each do |brand|
-        brand_name = compared_name(brand.name)
-        other_brands = RetailerBrand.where.not(site_id: site.id)
-        other_brands.each do |other_brand|
-          other_brand_name = compared_name(other_brand.name)
-          next unless matched(brand_name, other_brand_name)
+  def perform(args)
+    sites = args[:site_id].nil? ? Site.all : Site.where(id: args[:site_id])
+    establish_shard_connection(args[:country]) do
+      sites.each do |site|
+        site.retailer_brands.where(brand_id: nil).each do |brand|
+          brand_name = compared_name(brand.name)
+          other_brands = RetailerBrand.where.not(site_id: site.id)
+          other_brands.each do |other_brand|
+            other_brand_name = compared_name(other_brand.name)
+            next unless matched(brand_name, other_brand_name)
 
-          if (matched_brand = Brand.where(
-            "aliases && '{\"#{brand.name.upcase.gsub("'", "''").gsub('\\', '').gsub('"', '\\"')}\", "\
-            "\"#{other_brand.name.upcase.gsub("'", "''").gsub('\\', '').gsub('"', '\\"')}\"}'"
-          )&.first).nil?
-            matched_brand = Brand.create(
-              name: brand_name,
-              aliases: [brand_name, other_brand_name].uniq
-            )
-          else
-            matched_brand.update(aliases: (matched_brand.aliases + [brand_name, other_brand_name]).uniq)
+            if (matched_brand = Brand.where(
+              "aliases && '{\"#{brand.name.upcase.gsub("'", "''").gsub('\\', '').gsub('"', '\\"')}\", "\
+              "\"#{other_brand.name.upcase.gsub("'", "''").gsub('\\', '').gsub('"', '\\"')}\"}'"
+            )&.first).nil?
+              matched_brand = Brand.create(
+                name: brand_name,
+                aliases: [brand_name, other_brand_name].uniq
+              )
+            else
+              matched_brand.update(aliases: (matched_brand.aliases + [brand_name, other_brand_name]).uniq)
+            end
+            brand.update(brand_id: matched_brand.id)
+            other_brand.update(brand_id: matched_brand.id)
           end
-          brand.update(brand_id: matched_brand.id)
-          other_brand.update(brand_id: matched_brand.id)
         end
       end
     end
