@@ -3,6 +3,9 @@ Rails.application.routes.draw do
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
+   # Defines the root path route ("/")
+  root 'home#index'
+
   get 'products/:id' => 'products#show'
   get 'search' => 'products#search', as: :search
 
@@ -19,11 +22,9 @@ Rails.application.routes.draw do
       post 'connect_retailer_products_with_retailer_brands'
       post 'match_brands'
       post 'match_products'
+      post 'connect_products_with_categories'
     end
   end
-
-  # Defines the root path route ("/")
-  root 'products#index'
 
   resources :products, only: %i[index show update destroy]
   resources :brands, only: [] do

@@ -78,6 +78,11 @@ class SitesController < ApplicationController
     flash[:notice] = 'Job is being performed.'
   end
 
+  def connect_products_wiht_categories
+    ConnectProductsWithCategoriesJob.perform_later(params[:id])
+    flash[:notice] = 'Job is being performed.'
+  end
+
   private
 
   def site_params
