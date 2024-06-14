@@ -22,7 +22,7 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :products, only: %i[index show update destroy]
+  resources :products, only: %i[index show]
   resources :brands, only: [] do
     collection do
       get 'autocomplete'
