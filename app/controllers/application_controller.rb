@@ -4,7 +4,7 @@ class ApplicationController < ActionController::Base
   private
 
   def set_country
-    @country = params[:country] || 'Country1'
+    @country = params[:country]# || 'Country1'
   end
 
   def establish_shard_connection
