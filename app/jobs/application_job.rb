@@ -12,15 +12,15 @@ class ApplicationJob < ActiveJob::Base
   def establish_shard_connection(country)
     case country
     when 'Country1'
-      ActiveRecord::Base.connected_to(role: :writing, shard: :country1) do
+      ActiveRecord::Base.connected_to(shard: :country1) do
         yield
       end
     when 'Country2'
-      ActiveRecord::Base.connected_to(role: :writing, shard: :country1) do
+      ActiveRecord::Base.connected_to(shard: :country1) do
         yield
       end
     else
-      ActiveRecord::Base.connected_to(role: :writing, shard: :default) do
+      ActiveRecord::Base.connected_to(shard: :default) do
         yield
       end
     end

@@ -27,7 +27,7 @@
     </thead>
     <tbody>
       <%= link_to 'Price History Diagram', products_price_history_path(@product.id), class: 'btn btn-info' %>
-      <% @product.prices_per_site.sort_by{ |p| p[:price] }.each_with_index do |metric, index| %>
+      <% @rows.each_with_index do |metric, index| %>
         <tr>
           <td><%= index + 1 %></td>
           <td><%= link_to metric[:name], metric[:url] %></td>

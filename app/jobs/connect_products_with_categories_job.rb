@@ -5,9 +5,9 @@ class ConnectProductsWithCategoriesJob < ApplicationJob
 
   def perform(args = {})
     @site_ids = args[:site_id].nil? ? Site.pluck(:id) : [args[:site_id]]
-    establish_connection(args[:country])
-    connect
-    ActiveRecord::Base.establish_connection(:primary)
+    establish_shard_connection(args[:country]) do
+      connect
+    end
   end
 
   private

@@ -15,13 +15,13 @@
   <div class="input-group">
     <%= text_field_tag :q, params[:q], class: 'form-control mr-sm-2', placeholder: 'Search for name', style: "margin-right: 10px;" %>
 
-    <%= select_tag :category_id, options_from_collection_for_select(Category.where(id: Product.pluck(:category_id)).order(:name), :id, :name),
+    <%= select_tag :category_id, options_from_collection_for_select(@categories_for_selection, :id, :name),
                               include_blank: 'Select a category', class: 'nav-link dropdown-toggle', style: "margin-right: 10px;" %>
 
-    <%= select_tag :brand_id, options_from_collection_for_select(Brand.where(id: Product.pluck(:brand_id)).order(:name), :id, :name),
+    <%= select_tag :brand_id, options_from_collection_for_select(@brands_for_selection, :id, :name),
                               include_blank: 'Select a brand', class: 'nav-link dropdown-toggle', id: 'brand-select' %>
 
-    <%= select_tag :measurement_unit, options_for_select(Product.all.order(:measurement_unit).pluck(:measurement_unit).uniq.compact, :id),
+    <%= select_tag :measurement_unit, options_for_select(@units_for_selection, :id),
         include_blank: 'Select a unit', class: 'nav-link dropdown-toggle', style: "margin-left: 10px;" %>
 
     <div class="form-check form-check-inline">
@@ -44,11 +44,11 @@
       <div class="col-md-4 mb-4">
         <div class="card h-100">
           <div class="card-body">
-            <h5 class="card-title"><%= category.name %></h5>
-            <p class="card-text"><%= category.products_size%> Items</p>
+            <h5 class="card-title"><%= category[:name] %></h5>
+            <p class="card-text"><%= category[:products_size]%> Items</p>
           </div>
           <div class="card-footer">
-            <%= link_to 'View Products', products_path(category_id: category.id), class: 'btn btn-primary' %>
+            <%= link_to 'View Products', products_path(category_id: category[:id]), class: 'btn btn-primary' %>
           </div>
         </div>
       </div>
