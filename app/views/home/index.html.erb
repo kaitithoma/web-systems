@@ -10,33 +10,32 @@
 </head>
 <body>
 
-<form class="form-inline" style="margin-bottom: 20px; margin-top: 20px; margin-left: 20px; margin-right: 20px">
+
+<%= form_tag('/products', method: 'get', class: 'form-inline', style: 'margin-bottom: 20px; margin-top: 20px; margin-left: 20px; margin-right: 20px') do %>
   <div class="input-group">
-    <%= form_tag('/products', method: 'get') do %>
-      <%= text_field_tag :q, params[:q], class: 'form-control mr-sm-2', placeholder: 'Search for name', style: "margin-right: 10px;" %>
+    <%= text_field_tag :q, params[:q], class: 'form-control mr-sm-2', placeholder: 'Search for name', style: "margin-right: 10px;" %>
 
-      <%= select_tag :category_id, options_from_collection_for_select(Category.where(id: Product.pluck(:category_id)).order(:name), :id, :name),
-                                include_blank: 'Select a category', class: 'nav-link dropdown-toggle', style: "margin-right: 10px;" %>
+    <%= select_tag :category_id, options_from_collection_for_select(Category.where(id: Product.pluck(:category_id)).order(:name), :id, :name),
+                              include_blank: 'Select a category', class: 'nav-link dropdown-toggle', style: "margin-right: 10px;" %>
 
-      <%= select_tag :brand_id, options_from_collection_for_select(Brand.where(id: Product.pluck(:brand_id)).order(:name), :id, :name),
-                                include_blank: 'Select a brand', class: 'nav-link dropdown-toggle', id: 'brand-select' %>
+    <%= select_tag :brand_id, options_from_collection_for_select(Brand.where(id: Product.pluck(:brand_id)).order(:name), :id, :name),
+                              include_blank: 'Select a brand', class: 'nav-link dropdown-toggle', id: 'brand-select' %>
 
-      <%= select_tag :measurement_unit, options_for_select(Product.all.order(:measurement_unit).pluck(:measurement_unit).uniq.compact, :id),
-          include_blank: 'Select a unit', class: 'nav-link dropdown-toggle', style: "margin-left: 10px;" %>
+    <%= select_tag :measurement_unit, options_for_select(Product.all.order(:measurement_unit).pluck(:measurement_unit).uniq.compact, :id),
+        include_blank: 'Select a unit', class: 'nav-link dropdown-toggle', style: "margin-left: 10px;" %>
 
-      <div class="form-check form-check-inline">
-          <%= radio_button_tag :bundled, 'true', false %>
-          <%= label_tag 'bundled_true', 'With Discount' %>
-      </div>
-      <div class="form-check form-check-inline">
-          <%= radio_button_tag :bundled, 'false', false %>
-          <%= label_tag 'bundled_false', 'Without Discount' %>
-      </div>
+    <div class="form-check form-check-inline">
+        <%= radio_button_tag :bundled, 'true', false %>
+        <%= label_tag 'bundled_true', 'With Discount' %>
+    </div>
+    <div class="form-check form-check-inline">
+        <%= radio_button_tag :bundled, 'false', false %>
+        <%= label_tag 'bundled_false', 'Without Discount' %>
+    </div>
 
-      <%= submit_tag 'Search', class: 'btn btn-success', style:"margin-left: 10px;" %>
-    <% end %>
+    <%= submit_tag 'Search', class: 'btn btn-success', style:"margin-left: 10px;" %>
   </div>
-</form>
+<% end %>
 
 <div class="container mt-5">
   <h1 class="text-center mb-4">Select a Category</h1>
