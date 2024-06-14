@@ -3,7 +3,7 @@
 class ConnectProductsWithCategoriesJob < ApplicationJob
   queue_as :default
 
-  def perform(args)
+  def perform(args = {})
     @site_ids = args[:site_id].nil? ? Site.pluck(:id) : [args[:site_id]]
     establish_connection(args[:country])
     connect

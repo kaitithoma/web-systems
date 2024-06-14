@@ -3,7 +3,7 @@
 class CreateRetailerCategoriesJob < ApplicationJob
   queue_as :default
 
-  def perform(args)
+  def perform(args = {})
     # Retrieve all RetailerProductPriceMetric objects
     site_ids = args[:site_id].nil? ? Site.pluck(:id) : args[:site_id]
     retailer_product_price_metrics = RetailerProductPriceMetric.where(

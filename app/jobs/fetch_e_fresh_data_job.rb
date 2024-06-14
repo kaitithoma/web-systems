@@ -8,7 +8,7 @@ require 'pry'
 class FetchEFreshDataJob < ApplicationJob
   queue_as :default
 
-  def perform(args)
+  def perform(args = {})
     # Fetch products using Nokogiri
     @site = Site.find_by(name: 'E-Fresh')
     @url = @site.url

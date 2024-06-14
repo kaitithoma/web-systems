@@ -32,7 +32,7 @@ require 'selenium-webdriver'
 class FetchMyMarketDataNewJob < ApplicationJob
   queue_as :default
 
-  def perform(args)
+  def perform(args = {})
     # Fetch products using Nokogiri
     @site = Site.find_by(name: 'My Market')
     @url = @site.url

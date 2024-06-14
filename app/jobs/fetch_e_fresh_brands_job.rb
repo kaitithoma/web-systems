@@ -11,7 +11,7 @@ class FetchEFreshBrandsJob < ApplicationJob
 
   queue_as :default
 
-  def perform(args)
+  def perform(args = {})
     # Fetch brands using Nokogiri
     @site = Site.find_by(name: 'E-Fresh')
     @url = @site.url

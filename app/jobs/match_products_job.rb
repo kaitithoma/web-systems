@@ -7,7 +7,7 @@ class MatchProductsJob < ApplicationJob
   queue_as :default
 
   # This job should run for the site with the most products
-  def perform(args)
+  def perform(args = {})
     @site = Site.find(args[:site_id])
     @filter_greek_sw = Stopwords::Snowball::Filter.new 'el'
     @filter_english_sw = Stopwords::Snowball::Filter.new 'en'

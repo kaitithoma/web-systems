@@ -11,7 +11,7 @@ class FetchMyMarketBrandsJob < ApplicationJob
 
   queue_as :default
 
-  def perform(args)
+  def perform(args = {})
     @site = Site.find_by(name: 'My Market')
     @url = @site.url
     @country = args[:country]

@@ -46,37 +46,37 @@ class SitesController < ApplicationController
   end
 
   def add_categories
-    CreateRetailerCategoriesJob.perform_later(params[:id])
+    CreateRetailerCategoriesJob.perform_later({ site_id: params[:id] })
     flash[:notice] = 'Job is being performed.'
   end
 
   def add_products
-    CreateRetailerProductsJob.perform_later(params[:id])
+    CreateRetailerProductsJob.perform_later({ site_id: params[:id] })
     flash[:notice] = 'Job is being performed.'
   end
 
   def add_price_metrics
-    CreateProductPriceMetricsJob.perform_later(params[:id])
+    CreateProductPriceMetricsJob.perform_later({ site_id: params[:id] })
     flash[:notice] = 'Job is being performed.'
   end
 
   def connect_retailer_products_with_retailer_brands
-    ConnectRetailerProductsWithRetailerBrandsJob.perform_later(params[:id])
+    ConnectRetailerProductsWithRetailerBrandsJob.perform_later({ site_id: params[:id] })
     flash[:notice] = 'Job is being performed.'
   end
 
   def match_brands
-    MatchBrandsJob.perform_later(params[:id])
+    MatchBrandsJob.perform_later({ site_id: params[:id] })
     flash[:notice] = 'Job is being performed.'
   end
 
   def match_products
-    MatchProductsJob.perform_later(params[:id])
+    MatchProductsJob.perform_later({ site_id: params[:id] })
     flash[:notice] = 'Job is being performed.'
   end
 
   def connect_products_wiht_categories
-    ConnectProductsWithCategoriesJob.perform_later(params[:id])
+    ConnectProductsWithCategoriesJob.perform_later({ site_id: params[:id] })
     flash[:notice] = 'Job is being performed.'
   end
 

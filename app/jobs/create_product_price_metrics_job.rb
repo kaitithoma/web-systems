@@ -32,7 +32,7 @@ class CreateProductPriceMetricsJob < ApplicationJob
      'price_per_unit'] => 'final_price_per_unit'
   }.freeze
 
-  def perform(args)
+  def perform(args = {})
     @sites = args[:site_id].nil? ? Site.all : Site.where(id: args[:site_id])
     establish_shard_connection(args[:country]) do
       ProductPriceMetric.import(

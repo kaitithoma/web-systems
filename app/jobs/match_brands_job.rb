@@ -7,7 +7,7 @@ class MatchBrandsJob < ApplicationJob
 
   queue_as :default
 
-  def perform(args)
+  def perform(args = {})
     sites = args[:site_id].nil? ? Site.all : Site.where(id: args[:site_id])
     establish_shard_connection(args[:country]) do
       sites.each do |site|
