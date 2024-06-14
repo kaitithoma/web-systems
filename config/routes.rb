@@ -6,11 +6,7 @@ Rails.application.routes.draw do
    # Defines the root path route ("/")
   root 'home#index'
 
-  get 'products/:id' => 'products#show'
-  get 'search' => 'products#search', as: :search
-
-  get 'products/:id/price_history' => 'products#price_history',
-      as: :products_price_history
+  get 'products/:id/price_history' => 'products#price_history', as: :products_price_history
 
   resources :sites, only: %i[show index edit update] do
     member do
